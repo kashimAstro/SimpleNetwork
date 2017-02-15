@@ -12,7 +12,7 @@ void * loop(void * m)
 		if( str != "" )
 		{
 			cout << "Message:" << str << endl;
-			//
+			tcp.Send("ciao paperino");
 			tcp.clean();
 		}
 		usleep(1000);

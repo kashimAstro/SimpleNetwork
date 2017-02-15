@@ -25,6 +25,6 @@ class TCPClient
     TCPClient();
     bool setup(string address, int port);
     bool Send(string data);
-    string receive(int size=512);
+    string receive(int size = 4096);
     string read();
 };

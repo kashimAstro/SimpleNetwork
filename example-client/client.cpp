@@ -13,7 +13,11 @@ int main(int argc, char *argv[])
 		{
 			string msg = argv[1];
 			tcp.Send(msg);
-			cout << tcp.receive(msg.length()) << endl;
+			string rec = tcp.receive();
+			if( rec != "" )
+			{
+				cout << "Server Response:" << rec << endl;
+			}
 			sleep(1);
 		}
 		exit(0);

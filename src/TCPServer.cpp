@@ -17,10 +17,9 @@ void* TCPServer::Task(void *arg)
 		   break;
 		}
 		msg[n]=0;
-		send(newsockfd,msg,n,0);
+		//send(newsockfd,msg,n,0);
 		Message = string(msg);
         }
-	//close(newsockfd);
 	return 0;
 }
 
@@ -53,9 +52,15 @@ string TCPServer::getMessage()
 	return Message;
 }
 
+void TCPServer::Send(string msg)
+{
+	send(newsockfd,msg.c_str(),msg.length(),0);
+}
+
 void TCPServer::clean()
 {
 	Message = "";
+	memset(msg, 0, MAXPACKETSIZE);
 }
 
 void TCPServer::detach()

@@ -28,6 +28,7 @@ class TCPServer
 	void setup(int port);
 	string receive();
 	string getMessage();
+	void Send(string msg);
 	void detach();
 	void clean();
 
