@@ -5,7 +5,7 @@ string TCPServer::Message;
 void* TCPServer::Task(void *arg)
 {
 	int n;
-	int newsockfd=(int)arg;
+	int newsockfd = (long)arg;
 	char msg[MAXPACKETSIZE];
 	pthread_detach(pthread_self());
 	while(1)
