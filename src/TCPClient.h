@@ -1,3 +1,6 @@
+#ifndef TCP_CLIENT_H
+#define TCP_CLIENT_H
+
 #include <iostream>
 #include <stdio.h>
 #include <stdlib.h>
@@ -28,3 +31,5 @@ class TCPClient
     string receive(int size = 4096);
     string read();
 };
+
+#endif
