@@ -1,3 +1,6 @@
+#ifndef TCP_SERVER_H
+#define TCP_SERVER_H
+
 #include <iostream>
 #include <vector>
 #include <stdio.h>
@@ -35,3 +38,5 @@ class TCPServer
 	private:
 	static void * Task(void * argv);
 };
+
+#endif
