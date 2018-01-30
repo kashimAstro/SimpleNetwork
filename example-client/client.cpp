@@ -1,27 +1,30 @@
 #include <iostream>
+#include <signal.h>
 #include "TCPClient.h"
+
+TCPClient tcp;
+
+void sig_exit(int s)
+{
+	tcp.exit();
+	exit(0);
+}
 
 int main(int argc, char *argv[])
 {
-	if(argc >= 2)
+	signal(SIGINT, sig_exit);
+
+	tcp.setup("127.0.0.1",11999);
+	while(1)
 	{
-		TCPClient tcp;
-		tcp.setup("127.0.0.1",11999);
-		int num = atoi(argv[2]);
-		cout << "Num Request:" << num <<endl;
-		for(int i = 0; i < num; i++)
+		srand(time(NULL));
+		tcp.Send(to_string(rand()%25000));
+		string rec = tcp.receive();
+		if( rec != "" )
 		{
-			string msg = argv[1];
-			tcp.Send(msg);
-			string rec = tcp.receive();
-			if( rec != "" )
-			{
-				cout << "Server Response:" << rec << endl;
-			}
-			sleep(1);
+			cout << "Server Response:" << rec << endl;
 		}
-		exit(0);
-		return 0;
+		sleep(1);
 	}
-	else cout << "Error: message num-request" << endl;
+	return 0;
 }

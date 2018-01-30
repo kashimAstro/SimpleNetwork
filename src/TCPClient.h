@@ -30,6 +30,7 @@ class TCPClient
     bool Send(string data);
     string receive(int size = 4096);
     string read();
+    void exit();
 };
 
 #endif

@@ -61,12 +61,14 @@ bool TCPClient::Send(string data)
 string TCPClient::receive(int size)
 {
   	char buffer[size];
+	memset(&buffer[0], 0, sizeof(buffer));
+
   	string reply;
 	if( recv(sock , buffer , size, 0) < 0)// sizeof(buffer) 
   	{
 	    cout << "receive failed!" << endl;
   	}
-	buffer[size]='\0';
+	buffer[size-1]='\0';
   	reply = buffer;
   	return reply;
 }
@@ -84,4 +86,9 @@ string TCPClient::read()
 		reply += buffer[0];
 	}
 	return reply;
+}
+
+void TCPClient::exit()
+{
+    close( sock );
 }
