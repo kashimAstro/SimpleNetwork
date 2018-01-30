@@ -43,18 +43,23 @@ bool TCPClient::setup(string address , int port)
   	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
   	{
     		perror("connect failed. Error");
-    		return 1;
+    		return false;
   	}
   	return true;
 }
 
 bool TCPClient::Send(string data)
 {
-	if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+	if(sock != -1) 
 	{
-		cout << "Send failed : " << data << endl;
-		return false;
+		if( send(sock , data.c_str() , strlen( data.c_str() ) , 0) < 0)
+		{
+			cout << "Send failed : " << data << endl;
+			return false;
+		}
 	}
+	else
+		return false;
 	return true;
 }
 
@@ -64,9 +69,10 @@ string TCPClient::receive(int size)
 	memset(&buffer[0], 0, sizeof(buffer));
 
   	string reply;
-	if( recv(sock , buffer , size, 0) < 0)// sizeof(buffer) 
+	if( recv(sock , buffer , size, 0) < 0)
   	{
-	    cout << "receive failed!" << endl;
+	    	cout << "receive failed!" << endl;
+		return nullptr;
   	}
 	buffer[size-1]='\0';
   	reply = buffer;
@@ -81,7 +87,7 @@ string TCPClient::read()
     		if( recv(sock , buffer , sizeof(buffer) , 0) < 0)
     		{
       			cout << "receive failed!" << endl;
-      			break;
+			return nullptr;
     		}
 		reply += buffer[0];
 	}
