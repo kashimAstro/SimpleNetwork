@@ -3,10 +3,12 @@
 char TCPServer::msg[MAXPACKETSIZE];
 int TCPServer::num_client;
 int TCPServer::last_closed;
-vector<descript_socket*> TCPServer::Message;
+int TCPServer::counter_list;
+int TCPServer::counter_list_mem;
+bool TCPServer::isonline;
+vector<descript_socket*> TCPServer::Message[CODA_MSG];
 vector<descript_socket*> TCPServer::newsockfd;
 std::mutex TCPServer::mt;
-bool TCPServer::isonline;
 
 void* TCPServer::Task(void *arg)
 {
@@ -32,7 +34,12 @@ void* TCPServer::Task(void *arg)
 			}
 			msg[n]=0;
 			desc->message = string(msg);
-			Message.push_back( desc );
+
+			counter_list_mem = counter_list;
+			Message[counter_list].push_back( desc );
+			counter_list++;
+			if(counter_list >= CODA_MSG)
+				counter_list = 0;
 			mt.unlock();
 		}
 		usleep(600);
@@ -49,6 +56,8 @@ int TCPServer::setup(int port, vector<int> opts)
 	int opt = 1;
 	isonline = false;
 	last_closed = -1;
+	counter_list = 0;
+	counter_list_mem = 0;
 	sockfd = socket(AF_INET,SOCK_STREAM,0);
  	memset(&serverAddress,0,sizeof(serverAddress));
 
@@ -94,7 +103,7 @@ void TCPServer::accepted()
 
 vector<descript_socket*> TCPServer::getMessage()
 {
-	return Message;
+	return Message[counter_list_mem];
 }
 
 void TCPServer::Send(string msg, int id)
@@ -109,7 +118,7 @@ int TCPServer::get_last_closed_sockets()
 
 void TCPServer::clean(int id)
 {
-	Message[id]->message = "";
+	Message[counter_list_mem][id]->message = "";
 	memset(msg, 0, MAXPACKETSIZE);
 }
 
