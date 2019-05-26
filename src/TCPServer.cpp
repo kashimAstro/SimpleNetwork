@@ -1,70 +1,138 @@
 #include "TCPServer.h" 
 
-string TCPServer::Message;
+char TCPServer::msg[MAXPACKETSIZE];
+int TCPServer::num_client;
+int TCPServer::last_closed;
+vector<descript_socket*> TCPServer::Message;
+vector<descript_socket*> TCPServer::newsockfd;
+std::mutex TCPServer::mt;
+bool TCPServer::isonline;
 
 void* TCPServer::Task(void *arg)
 {
 	int n;
-	int newsockfd = (long)arg;
-	char msg[MAXPACKETSIZE];
+	struct descript_socket *desc = (struct descript_socket*) arg;
 	pthread_detach(pthread_self());
+
+        cerr << "open client[ id:"<< desc->id <<" ip:"<< desc->ip <<" socket:"<< desc->socket<<" ]" << endl;
 	while(1)
 	{
-		n=recv(newsockfd,msg,MAXPACKETSIZE,0);
-		if(n==0)
-		{
-		   close(newsockfd);
-		   break;
+		n = recv(desc->socket, msg, MAXPACKETSIZE, 0);
+		if(n != -1) {
+			mt.lock();
+			if(n==0)
+			{
+			   isonline = false;
+			   cerr << "close client[ id:"<< desc->id <<" ip:"<< desc->ip <<" socket:"<< desc->socket<<" ]" << endl;
+			   last_closed = desc->id;
+			   close(desc->socket);
+			   newsockfd.erase(newsockfd.begin()+desc->id);
+			   if(num_client>0) num_client--;
+			   break;
+			}
+			msg[n]=0;
+			desc->message = string(msg);
+			Message.push_back( desc );
+			mt.unlock();
 		}
-		msg[n]=0;
-		//send(newsockfd,msg,n,0);
-		Message = string(msg);
+		usleep(600);
         }
+	if(desc != NULL)
+		free(desc);
+	pthread_exit(NULL);
+	
 	return 0;
 }
 
-void TCPServer::setup(int port)
+int TCPServer::setup(int port, vector<int> opts)
 {
-	sockfd=socket(AF_INET,SOCK_STREAM,0);
+	int opt = 1;
+	isonline = false;
+	last_closed = -1;
+	sockfd = socket(AF_INET,SOCK_STREAM,0);
  	memset(&serverAddress,0,sizeof(serverAddress));
-	serverAddress.sin_family=AF_INET;
-	serverAddress.sin_addr.s_addr=htonl(INADDR_ANY);
-	serverAddress.sin_port=htons(port);
-	bind(sockfd,(struct sockaddr *)&serverAddress, sizeof(serverAddress));
- 	listen(sockfd,5);
-}
 
-string TCPServer::receive()
-{
-	string str;
-	while(1)
-	{
-		socklen_t sosize  = sizeof(clientAddress);
-		newsockfd = accept(sockfd,(struct sockaddr*)&clientAddress,&sosize);
-		str = inet_ntoa(clientAddress.sin_addr);
-		pthread_create(&serverThread,NULL,&Task,(void *)newsockfd);
+	for(unsigned int i = 0; i < opts.size(); i++) {
+		if( (setsockopt(sockfd, SOL_SOCKET, opts.size(), (char *)&opt, sizeof(opt))) < 0 ) {
+			cerr << "Errore setsockopt" << endl; 
+      			return -1;
+	      	}
 	}
-	return str;
+
+	serverAddress.sin_family      = AF_INET;
+	serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
+	serverAddress.sin_port        = htons(port);
+
+	if((bind(sockfd,(struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
+		cerr << "Errore bind" << endl;
+		return -1;
+	}
+	
+ 	if(listen(sockfd,5) < 0){
+		cerr << "Errore listen" << endl;
+		return -1;
+	}
+	num_client = 0;
+	isonline = true;
+	return 0;
 }
 
-string TCPServer::getMessage()
+void TCPServer::accepted()
+{
+	socklen_t sosize    = sizeof(clientAddress);
+	descript_socket *so = new descript_socket;
+	so->socket          = accept(sockfd,(struct sockaddr*)&clientAddress,&sosize);
+	so->id              = num_client;
+	so->ip              = inet_ntoa(clientAddress.sin_addr);
+	newsockfd.push_back( so );
+	cerr << "accept client[ id:" << newsockfd[num_client]->id << 
+	                      " ip:" << newsockfd[num_client]->ip << 
+		              " handle:" << newsockfd[num_client]->socket << " ]" << endl;
+	pthread_create(&serverThread[num_client], NULL, &Task, (void *)newsockfd[num_client]);
+	num_client++;
+}
+
+vector<descript_socket*> TCPServer::getMessage()
 {
 	return Message;
 }
 
-void TCPServer::Send(string msg)
+void TCPServer::Send(string msg, int id)
 {
-	send(newsockfd,msg.c_str(),msg.length(),0);
+	send(newsockfd[id]->socket,msg.c_str(),msg.length(),0);
 }
 
-void TCPServer::clean()
+int TCPServer::get_last_closed_sockets()
 {
-	Message = "";
+	return last_closed;
+}
+
+void TCPServer::clean(int id)
+{
+	Message[id]->message = "";
 	memset(msg, 0, MAXPACKETSIZE);
 }
 
-void TCPServer::detach()
+string TCPServer::get_ip_addr(int id)
+{
+	return newsockfd[id]->ip;
+}
+
+bool TCPServer::is_online() 
+{
+	return isonline;
+}
+
+void TCPServer::detach(int id)
+{
+	close(newsockfd[id]->socket);
+	newsockfd[id]->ip = "";
+	newsockfd[id]->id = -1;
+	newsockfd[id]->message = "";
+} 
+
+void TCPServer::closed() 
 {
 	close(sockfd);
-	close(newsockfd);
-} 
+}
+

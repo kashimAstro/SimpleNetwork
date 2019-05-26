@@ -17,7 +17,7 @@ bool TCPClient::setup(string address , int port)
       			cout << "Could not create socket" << endl;
     		}
         }
-  	if(inet_addr(address.c_str()) == -1)
+  	if((signed)inet_addr(address.c_str()) == -1)
   	{
     		struct hostent *he;
     		struct in_addr **addr_list;
