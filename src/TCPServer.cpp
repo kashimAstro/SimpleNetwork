@@ -14,7 +14,7 @@ void* TCPServer::Task(void *arg)
 	struct descript_socket *desc = (struct descript_socket*) arg;
 	pthread_detach(pthread_self());
 
-        cerr << "open client[ id:"<< desc->id <<" ip:"<< desc->ip <<" socket:"<< desc->socket<<" ]" << endl;
+        cerr << "open client[ id:"<< desc->id <<" ip:"<< desc->ip <<" socket:"<< desc->socket<<" send:"<< desc->enable_message_runtime <<" ]" << endl;
 	while(1)
 	{
 		n = recv(desc->socket, msg, MAXPACKETSIZE, 0);

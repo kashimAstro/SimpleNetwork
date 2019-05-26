@@ -18,7 +18,7 @@ void * send_client(void * m) {
 
 	while(1) {
 		if(!tcp.is_online() && tcp.get_last_closed_sockets() == desc->id) {
-			cerr << "Connessione chiusa: stop send_clients( id:" << desc->id << " ip:" << desc->ip << endl;
+			cerr << "Connessione chiusa: stop send_clients( id:" << desc->id << " ip:" << desc->ip << " )"<< endl;
 			break;
 		}
 		std::time_t t = std::time(0);
@@ -92,6 +92,7 @@ int main(int argc, char **argv)
 		{
 			while(1) {
 				tcp.accepted();
+				cerr << "Accepted" << endl;
 			}
 		}
 	}
