@@ -52,7 +52,7 @@ void * received(void * m)
 		for(unsigned int i = 0; i < desc.size(); i++) {
 			if( desc[i]->message != "" )
 			{
-				if(desc[i]->message != "" && !desc[i]->enable_message_runtime) 
+				if(!desc[i]->enable_message_runtime) 
 				{
 					desc[i]->enable_message_runtime = true;
 			                if( pthread_create(&msg1[num_message], NULL, send_client, (void *) desc[i]) == 0) {
