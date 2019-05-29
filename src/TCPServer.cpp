@@ -26,7 +26,6 @@ void* TCPServer::Task(void *arg)
 			   cerr << "close client[ id:"<< desc->id <<" ip:"<< desc->ip <<" socket:"<< desc->socket<<" ]" << endl;
 			   last_closed = desc->id;
 			   close(desc->socket);
-			   newsockfd.erase(newsockfd.begin()+desc->id);
 
 			   int id = desc->id;
 			   auto new_end = std::remove_if(newsockfd.begin(), newsockfd.end(),
