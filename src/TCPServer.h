@@ -19,7 +19,7 @@ using namespace std;
 
 #define MAXPACKETSIZE 40960
 #define MAX_CLIENT 1000
-#define CODA_MSG 4
+//#define CODA_MSG 4
 
 struct descript_socket{
 	int socket     = -1;
@@ -51,10 +51,8 @@ class TCPServer
 
 	static vector<descript_socket*> newsockfd;
 	static char msg[ MAXPACKETSIZE ];
-	static vector<descript_socket*> Message[CODA_MSG];
+	static vector<descript_socket*> Message;//[CODA_MSG];
 
-	static int counter_list;
-	static int counter_list_mem;
 	static bool isonline;
 	static int last_closed;
 	static int num_client;
