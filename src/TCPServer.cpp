@@ -21,7 +21,6 @@ void* TCPServer::Task(void *arg)
 	{
 		n = recv(desc->socket, msg, MAXPACKETSIZE, 0);
 		if(n != -1) {
-			mt.lock();
 			if(n==0)
 			{
 			   isonline = false;
@@ -36,6 +35,8 @@ void* TCPServer::Task(void *arg)
 			desc->message = string(msg);
 
 			counter_list_mem = counter_list;
+	                std::lock_guard<std::mutex> guard(mt);
+
 			Message[counter_list].push_back( desc );
 			counter_list++;
 			if(counter_list >= CODA_MSG)
@@ -103,6 +104,7 @@ void TCPServer::accepted()
 
 vector<descript_socket*> TCPServer::getMessage()
 {
+	std::lock_guard<std::mutex> guard(mt);
 	return Message[counter_list_mem];
 }
 
