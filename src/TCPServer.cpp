@@ -18,7 +18,8 @@ void* TCPServer::Task(void *arg)
 	while(1)
 	{
 		n = recv(desc->socket, msg, MAXPACKETSIZE, 0);
-		if(n != -1) {
+		if(n != -1) 
+		{
 			if(n==0)
 			{
 			   isonline = false;
@@ -26,6 +27,13 @@ void* TCPServer::Task(void *arg)
 			   last_closed = desc->id;
 			   close(desc->socket);
 			   newsockfd.erase(newsockfd.begin()+desc->id);
+
+			   int id = desc->id;
+			   auto new_end = std::remove_if(newsockfd.begin(), newsockfd.end(),
+                				           		   [id](descript_socket *device)
+		                              				   { return device->id == id; });
+			   newsockfd.erase(new_end, newsockfd.end());
+
 			   if(num_client>0) num_client--;
 			   break;
 			}
@@ -38,6 +46,7 @@ void* TCPServer::Task(void *arg)
         }
 	if(desc != NULL)
 		free(desc);
+	cerr << "exit thread: " << this_thread::get_id() << endl;
 	pthread_exit(NULL);
 	
 	return 0;

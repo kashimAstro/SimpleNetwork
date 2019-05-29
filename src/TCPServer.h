@@ -13,6 +13,9 @@
 #include <string.h>
 #include <arpa/inet.h>
 #include <pthread.h>
+#include <thread>
+#include <algorithm>
+#include <cctype>
 #include <mutex>
 
 using namespace std;
