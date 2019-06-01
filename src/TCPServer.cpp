@@ -96,6 +96,7 @@ void TCPServer::accepted()
 	                      " ip:" << newsockfd[num_client]->ip << 
 		              " handle:" << newsockfd[num_client]->socket << " ]" << endl;
 	pthread_create(&serverThread[num_client], NULL, &Task, (void *)newsockfd[num_client]);
+	isonline=true;
 	num_client++;
 }
 
