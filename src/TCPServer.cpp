@@ -70,7 +70,7 @@ int TCPServer::setup(int port, vector<int> opts)
 	serverAddress.sin_addr.s_addr = htonl(INADDR_ANY);
 	serverAddress.sin_port        = htons(port);
 
-	if((bind(sockfd,(struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
+	if((::bind(sockfd,(struct sockaddr *)&serverAddress, sizeof(serverAddress))) < 0){
 		cerr << "Errore bind" << endl;
 		return -1;
 	}
