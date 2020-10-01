@@ -1,4 +1,4 @@
-# SimpleNetwork
+# Simple Network for Networking
 
 <pre><code>
 $ ./server 5050 1 <br>
