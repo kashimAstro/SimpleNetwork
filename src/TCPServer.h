@@ -7,7 +7,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h> 
+#include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <string.h>
@@ -24,43 +24,44 @@ using namespace std;
 #define MAX_CLIENT 1000
 //#define CODA_MSG 4
 
-struct descript_socket{
-	int socket     = -1;
-	string ip      = "";
-	int id         = -1; 
+struct descript_socket
+{
+	int socket = -1;
+	string ip = "";
+	int id = -1;
 	std::string message;
 	bool enable_message_runtime = false;
 };
 
 class TCPServer
 {
-	public:
+public:
 	int setup(int port, vector<int> opts = vector<int>());
-	vector<descript_socket*> getMessage();
+	vector<descript_socket *> getMessage();
 	void accepted();
 	void Send(string msg, int id);
 	void detach(int id);
 	void clean(int id);
-        bool is_online();
+	bool is_online();
 	string get_ip_addr(int id);
 	int get_last_closed_sockets();
 	void closed();
 
-	private:
+private:
 	int sockfd, n, pid;
 	struct sockaddr_in serverAddress;
 	struct sockaddr_in clientAddress;
-	pthread_t serverThread[ MAX_CLIENT ];
+	pthread_t serverThread[MAX_CLIENT];
 
-	static vector<descript_socket*> newsockfd;
-	static char msg[ MAXPACKETSIZE ];
-	static vector<descript_socket*> Message;//[CODA_MSG];
+	static vector<descript_socket *> newsockfd;
+	static char msg[MAXPACKETSIZE];
+	static vector<descript_socket *> Message; //[CODA_MSG];
 
-	static bool isonline;
+	static bool isOnline;
 	static int last_closed;
 	static int num_client;
 	static std::mutex mt;
-	static void * Task(void * argv);
+	static void *Task(void *argv);
 };
 
 #endif
