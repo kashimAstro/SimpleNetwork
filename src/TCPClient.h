@@ -11,26 +11,26 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <netdb.h>
-#include <netdb.h> 
+#include <netdb.h>
 #include <vector>
 
 using namespace std;
 
 class TCPClient
 {
-  private:
-    int sock;
-    std::string address;
-    int port;
-    struct sockaddr_in server;
+private:
+  int sock;
+  std::string address;
+  int port;
+  struct sockaddr_in server;
 
-  public:
-    TCPClient();
-    bool setup(string address, int port);
-    bool Send(string data);
-    string receive(int size = 4096);
-    string read();
-    void exit();
+public:
+  TCPClient();
+  bool setup(string address, int port);
+  bool Send(string data);
+  string receive(int size = 4096);
+  string read();
+  void exit();
 };
 
 #endif
