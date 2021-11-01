@@ -44,7 +44,10 @@ void* TCPServer::Task(void *arg)
 		usleep(600);
         }
 	if(desc != NULL)
-		free(desc);
+	{
+		delete desc;
+		desc = NULL;
+	}
 	cerr << "exit thread: " << this_thread::get_id() << endl;
 	pthread_exit(NULL);
 	
@@ -118,7 +121,7 @@ int TCPServer::get_last_closed_sockets()
 
 void TCPServer::clean(int id)
 {
-	Message[id]->message = "";
+	Message[id] = NULL;
 	memset(msg, 0, MAXPACKETSIZE);
 }
 
