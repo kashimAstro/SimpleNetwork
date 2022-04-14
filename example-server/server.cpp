@@ -50,7 +50,7 @@ void * received(void * m)
 	{
 		desc = tcp.getMessage();
 		for(unsigned int i = 0; i < desc.size(); i++) {
-			if( desc )
+			if( desc[i] )
 			{
 				if(!desc[i]->enable_message_runtime) 
 				{
